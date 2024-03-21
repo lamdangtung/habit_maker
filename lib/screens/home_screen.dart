@@ -37,13 +37,13 @@ class _HomeScreenState extends State<HomeScreen> {
         child: AppBar(
           backgroundColor: themeData.colorScheme.background,
           elevation: 0,
-          leading: IconButton(
-            onPressed: () {},
-            icon: const Icon(Icons.settings),
-          ),
           actions: [
             IconButton(
-              onPressed: () {},
+              onPressed: () async {
+                await context
+                    .read<SelectedDayCubit>()
+                    .changeSelectedDay(DateTime.now());
+              },
               icon: const Icon(Icons.event_note),
             ),
             IconButton(
@@ -67,41 +67,38 @@ class _HomeScreenState extends State<HomeScreen> {
       ),
       body: SafeArea(
         child: Center(
-          child: BlocProvider(
-            create: (context) => SelectedDayCubit(),
-            child: Padding(
-              padding: defaultHorizontalViewPadding,
-              child: ListView(
-                children: [
-                  const CalendarHabits(),
-                  BlocBuilder<SelectedDayCubit, SelectedDay>(
-                    builder: (context, selectedDay) {
-                      List<Habit> habitsToShow = selectedDay.habits;
-                      return ListView.builder(
-                        physics: const NeverScrollableScrollPhysics(),
-                        shrinkWrap: true,
-                        itemCount:
-                            habitsToShow.isEmpty ? 1 : habitsToShow.length,
-                        itemBuilder: (context, index) {
-                          if (habitsToShow.isEmpty) {
-                            return const NoHabitsFound();
-                          }
+          child: Padding(
+            padding: defaultHorizontalViewPadding,
+            child: ListView(
+              children: [
+                const CalendarHabits(),
+                BlocBuilder<SelectedDayCubit, SelectedDay>(
+                  builder: (context, selectedDay) {
+                    List<Habit> habitsToShow = selectedDay.habits;
+                    return ListView.builder(
+                      physics: const NeverScrollableScrollPhysics(),
+                      shrinkWrap: true,
+                      itemCount:
+                          habitsToShow.isEmpty ? 1 : habitsToShow.length,
+                      itemBuilder: (context, index) {
+                        if (habitsToShow.isEmpty) {
+                          return const NoHabitsFound();
+                        }
 
-                          Habit habit = habitsToShow[index];
-                          return HabitItem(
-                            title: habit.name,
-                            icon: IconsRepository().getIconData(habit.icon),
-                            description: habit.isDone ? tr.finished : tr.to_do,
-                            iconDescription:
-                                habit.isDone ? Icons.check_circle : Icons.star,
-                            index: index,
-                          );
-                        },
-                      );
-                    },
-                  ),
-                ],
-              ),
+                        Habit habit = habitsToShow[index];
+                        return HabitItem(
+                          title: habit.name,
+                          icon: IconsRepository().getIconData(habit.icon),
+                          description: habit.isDone ? tr.finished : tr.to_do,
+                          iconDescription:
+                              habit.isDone ? Icons.check_circle : Icons.star,
+                          index: index,
+                        );
+                      },
+                    );
+                  },
+                ),
+              ],
             ),
           ),
         ),
@@ -171,6 +168,7 @@ class CalendarHabits extends StatelessWidget {
 
 class CalendarSelectedDay extends StatelessWidget {
   final DateTime day;
+
   const CalendarSelectedDay({super.key, required this.day});
 
   @override
@@ -201,6 +199,7 @@ class CalendarSelectedDay extends StatelessWidget {
 
 class CalendarTodayDay extends StatelessWidget {
   final DateTime day;
+
   const CalendarTodayDay({super.key, required this.day});
 
   @override
@@ -231,6 +230,7 @@ class CalendarTodayDay extends StatelessWidget {
 class CalendarDow extends StatelessWidget {
   final DateTime day;
   final String text;
+
   const CalendarDow({super.key, required this.day, required this.text});
 
   @override
@@ -260,6 +260,7 @@ class CalendarDow extends StatelessWidget {
 
 class CalendarDowSameDay extends StatelessWidget {
   final String text;
+
   const CalendarDowSameDay({super.key, required this.text});
 
   @override
@@ -308,6 +309,7 @@ class HabitItemVisible extends StatelessWidget {
   final IconData icon;
   final IconData? iconDescription;
   final int index;
+
   const HabitItemVisible({
     super.key,
     required this.title,
@@ -392,6 +394,7 @@ class HabitItemVisible extends StatelessWidget {
 class MarkAsDoneButton extends StatefulWidget {
   final int index;
   final SelectedDay state;
+
   const MarkAsDoneButton({super.key, required this.index, required this.state});
 
   @override
@@ -400,6 +403,7 @@ class MarkAsDoneButton extends StatefulWidget {
 
 class _MarkAsDoneButtonState extends State<MarkAsDoneButton> {
   late ConfettiController confettiController;
+
   Path drawStar(Size size) {
     double degToRad(double deg) => deg * (pi / 180.0);
 
@@ -479,6 +483,7 @@ class _MarkAsDoneButtonState extends State<MarkAsDoneButton> {
 class HabitItemCalendarItem extends StatelessWidget {
   final DateTime day;
   final List<DateTime> doneOn;
+
   const HabitItemCalendarItem(
       {super.key, required this.day, required this.doneOn});
 
@@ -514,6 +519,7 @@ class HabitItemCalendarItem extends StatelessWidget {
 
 class EditHabitButton extends StatelessWidget {
   final String id;
+
   const EditHabitButton({super.key, required this.id});
 
   @override
@@ -537,6 +543,7 @@ class EditHabitButton extends StatelessWidget {
 
 class HabitItemExpanded extends StatelessWidget {
   final int index;
+
   const HabitItemExpanded({super.key, required this.index});
 
   @override
@@ -626,6 +633,7 @@ class HabitItem extends StatelessWidget {
   final IconData icon;
   final IconData? iconDescription;
   final int index;
+
   const HabitItem({
     super.key,
     required this.title,
@@ -670,4 +678,3 @@ class HabitItem extends StatelessWidget {
     );
   }
 }
-
